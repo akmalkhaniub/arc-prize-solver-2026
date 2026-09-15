@@ -1,0 +1,23 @@
+{
+  "name": "arc-prize-solver",
+  "version": "1.0.0",
+  "description": "Neuro-Symbolic Program Synthesis & DSL Solver for ARC Prize 2026",
+  "main": "src/arc_dsl.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test/verify_arc_solver.js",
+    "start": "node test/verify_arc_solver.js"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "arc-prize",
+    "arc-agi",
+    "program-synthesis",
+    "neuro-symbolic",
+    "reasoning",
+    "kaggle"
+  ],
+  "author": "Antigravity Builder",
+  "license": "MIT"
+}
