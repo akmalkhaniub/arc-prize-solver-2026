@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARC Prize Solver 2026 — Neuro-Symbolic Program Synthesis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Authentic ARC Prize 10-Color Palette */
+    .arc-0 { background-color: #000000; }
+    .arc-1 { background-color: #0074D9; }
+    .arc-2 { background-color: #FF4136; }
+    .arc-3 { background-color: #2ECC40; }
+    .arc-4 { background-color: #FFDC00; }
+    .arc-5 { background-color: #AAAAAA; }
+    .arc-6 { background-color: #F012BE; }
+    .arc-7 { background-color: #FF851B; }
+    .arc-8 { background-color: #7FDBFF; }
+    .arc-9 { background-color: #870C25; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-purple-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-500 to-pink-400 flex items-center justify-center text-slate-950 shadow-lg shadow-purple-500/20">
+          <i class="fa-solid fa-shapes text-lg font-black"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-extrabold text-lg tracking-tight">ARC Prize Solver 2026</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/40">AGI BENCHMARK</span>
+          </div>
+          <p class="text-xs text-slate-400">Test-Time Compute (TTC) & Refinement Loops on ARC-AGI-3</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <select id="taskSelector" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500">
+          <option value="gravity_reflect">Composite: Gravity + Reflect</option>
+          <option value="reflection">Horizontal Reflection</option>
+          <option value="substitution">Color Substitution (Blue -> Red)</option>
+        </select>
+        <button id="btnRunSolver" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-bold text-xs shadow-lg shadow-purple-500/20 transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-play"></i>
+          <span>Synthesize Solution</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+
+    <!-- Synthesis Output Card -->
+    <div class="p-5 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+      <div>
+        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Synthesized Program Hypothesis</span>
+        <div class="text-lg font-mono font-black text-purple-400 mt-0.5 flex items-center space-x-3">
+          <span id="programNameDisplay">reflectH >> applyGravityDown</span>
+          <span id="confidenceBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-sans">100% CONFIDENCE (TTC Verified)</span>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-[10px] text-slate-400">Search Compute Latency</span>
+        <div id="latencyDisplay" class="text-sm font-mono text-slate-200">4 ms</div>
+      </div>
+    </div>
+
+    <!-- Demonstration Grids: Train Pairs -->
+    <div class="space-y-3">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Few-Shot Training Demonstrations</h3>
+      <div id="trainPairsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- Test Evaluation Grid -->
+    <div class="space-y-3">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Test Grid Prediction & Evaluation</h3>
+      <div id="testPairContainer" class="p-6 rounded-3xl bg-slate-900 border border-purple-500/40">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let allTasks = {};
+    let currentTaskKey = 'gravity_reflect';
+
+    async function loadTasks() {
+      const res = await fetch('/api/tasks');
+      allTasks = await res.json();
+      runSolve();
+    }
+
+    document.getElementById('taskSelector').onchange = (e) => {
+      currentTaskKey = e.target.value;
+      runSolve();
+    };
+
+    document.getElementById('btnRunSolver').onclick = () => {
+      runSolve();
+    };
+
+    async function runSolve() {
+      const task = allTasks[currentTaskKey];
+      if (!task) return;
+
+      const res = await fetch('/api/solve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      });
+      const data = await res.json();
+      renderApp(task, data);
+    }
+
+    function renderGrid(matrix) {
+      const H = matrix.length;
+      const W = matrix[0].length;
+      let html = `<div class="inline-grid gap-0.5 p-1.5 bg-slate-950 rounded-xl border border-slate-800" style="grid-template-columns: repeat(${W}, minmax(0, 1fr));">`;
+      for (let r = 0; r < H; r++) {
+        for (let c = 0; c < W; c++) {
+          const colorIdx = matrix[r][c];
+          html += `<div class="w-8 h-8 rounded arc-${colorIdx} border border-white/5"></div>`;
+        }
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function renderApp(task, solveData) {
+      document.getElementById('programNameDisplay').innerText = solveData.programDescription;
+      document.getElementById('latencyDisplay').innerText = `${solveData.computeTimeMs} ms`;
+
+      // Render train pairs
+      const trainContainer = document.getElementById('trainPairsContainer');
+      trainContainer.innerHTML = '';
+      task.train.forEach((pair, idx) => {
+        const card = document.createElement('div');
+        card.className = 'p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-around';
+        card.innerHTML = `
+          <div class="text-center">
+            <span class="text-[10px] text-slate-500 font-mono mb-1 block">Train Input #${idx+1}</span>
+            ${renderGrid(pair.input)}
+          </div>
+          <div class="text-purple-400 font-black text-lg">➔</div>
+          <div class="text-center">
+            <span class="text-[10px] text-slate-500 font-mono mb-1 block">Demonstration Target</span>
+            ${renderGrid(pair.output)}
+          </div>
+        `;
+        trainContainer.appendChild(card);
+      });
+
+      // Render test pair
+      const testContainer = document.getElementById('testPairContainer');
+      const testInput = task.test[0].input;
+      const testPrediction = solveData.predictions[0];
+      testContainer.innerHTML = `
+        <div class="flex items-center justify-around">
+          <div class="text-center">
+            <span class="text-xs font-bold text-slate-400 mb-2 block">Novel Test Input</span>
+            ${renderGrid(testInput)}
+          </div>
+          <div class="text-purple-400 font-black text-xl">➔ [${solveData.programDescription}] ➔</div>
+          <div class="text-center">
+            <span class="text-xs font-bold text-emerald-400 mb-2 block">Synthesized Test Prediction</span>
+            ${renderGrid(testPrediction)}
+          </div>
+        </div>
+      `;
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
