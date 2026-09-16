@@ -5,8 +5,12 @@
   "main": "src/arc_dsl.js",
   "type": "module",
   "scripts": {
+    "start": "node src/server.js",
     "test": "node test/verify_arc_solver.js",
-    "start": "node test/verify_arc_solver.js"
+    "docker:build": "docker build -t arc-prize-solver:latest .",
+    "docker:run": "docker run -d -p 3007:3007 --name arc-prize-solver arc-prize-solver:latest",
+    "docker:compose": "docker compose up -d",
+    "tunnel": "powershell -ExecutionPolicy Bypass -File deploy/free/tunnel.ps1"
   },
   "dependencies": {},
   "devDependencies": {},

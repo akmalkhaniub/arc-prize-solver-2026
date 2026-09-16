@@ -1,0 +1,19 @@
+services:
+  arc-prize-solver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: arc-prize-solver:latest
+    container_name: arc-prize-solver
+    ports:
+      - "3007:3007"
+    environment:
+      - NODE_ENV=production
+      - PORT=3007
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3007/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped

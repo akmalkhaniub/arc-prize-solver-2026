@@ -1,0 +1,14 @@
+{
+  "id": "akmalkhaniub/arc-prize-solver-2026-kernel",
+  "title": "ARC Prize 2026 Neuro-Symbolic Solver",
+  "code_file": "kaggle_inference.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": false,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "dataset_sources": ["arc-prize-2026"],
+  "competition_sources": ["arc-prize-2026"],
+  "kernel_sources": []
+}
