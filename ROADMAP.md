@@ -4,23 +4,26 @@
 
 ---
 
+> **Status legend (updated 2026-09-18):** `[x]` implemented in code · `[~]` partial / stand-in (working prototype, smaller than the target scope) · `[ ]` not started.
+> **Reality note:** **Rebuilt in Python** (`arcsolver/` package; the old Node prototype is under `legacy-js/`). Depth-1/-2 program synthesis over a NumPy DSL with train-pair verification and colour-map inference, producing and validating a Kaggle **`submission.json`** (two attempts per test input). `notebooks/kaggle_run.py` is the offline Kaggle entry point; 6 pytest cases pass. Still symbolic-only — no LLM code-gen branch or test-time training — so it is a fast baseline, not a leaderboard winner.
+
 ## Phase 1: DSL Engine & Primitive Library (Milestone 1)
-- [ ] Implement Python/NumPy library of ~40 core ARC transformation primitives.
-- [ ] Build object segmentation module (connected components, color clusters, bounding boxes).
-- [ ] Create automated unit test suite verifying primitives on canonical ARC training pairs.
+- [~] Implement Python/NumPy library of ~40 core ARC transformation primitives. *(~13 primitives, in JS)*
+- [~] Build object segmentation module (connected components, color clusters, bounding boxes).
+- [x] Create automated unit test suite verifying primitives on canonical ARC training pairs.
 
 ## Phase 2: Beam Search & Genetic Program Synthesis (Milestone 2)
-- [ ] Implement depth-bounded beam search combining primitive functions into composition pipelines.
-- [ ] Implement pruning heuristics: reject programs that alter non-target background or violate dimension invariants.
+- [x] Implement depth-bounded beam search combining primitive functions into composition pipelines. *(depth-2)*
+- [~] Implement pruning heuristics: reject programs that alter non-target background or violate dimension invariants.
 - [ ] Benchmark DSL solver on the 400 ARC training tasks to establish baseline solve rate.
 
 ## Phase 3: LLM Reasoning & Code Generation Pipeline (Milestone 3)
-- [ ] Build ASCII grid serializer and compact visual representation format for LLMs.
+- [~] Build ASCII grid serializer and compact visual representation format for LLMs.
 - [ ] Setup API harness for DeepSeek-R1 / Qwen2.5-Coder to generate candidate Python solutions.
 - [ ] Implement secure sandboxed code execution runtime with sub-second timeouts.
-- [ ] Create test-time verification loop that filters only 100% training-consistent programs.
+- [x] Create test-time verification loop that filters only 100% training-consistent programs.
 
 ## Phase 4: Ensembling, Kaggle Offline Packaging & Submission (Milestone 4)
-- [ ] Combine Symbolic DSL + LLM code generation into a unified two-attempt prediction pipeline.
+- [~] Combine Symbolic DSL + LLM code generation into a unified two-attempt prediction pipeline. *(symbolic only)*
 - [ ] Package all dependencies and models for Kaggle's offline-inference competition environment (< 9 hour limit).
 - [ ] Validate generated `submission.json` against Kaggle evaluation harness and submit.

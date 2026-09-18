@@ -1,6 +1,8 @@
 # Technical Specification: Neuro-Symbolic ARC Solver
 **Project Name:** Neuro-Symbolic ARC Solver (ARC Prize 2026)  
-**Status:** Ready for Implementation  
+**Status:** Rebuilt in Python — produces a Kaggle submission (updated 2026-09-18)  
+
+> **Implementation status (2026-09-18):** Rebuilt from the Node prototype (now under `legacy-js/`) into a Python package (`arcsolver/`). Depth-1/-2 program synthesis over a NumPy DSL with train-pair verification and colour-map inference; `arcsolver/submission.py` builds and validates the ARC-AGI `submission.json` (two attempts per test input) and `notebooks/kaggle_run.py` is the offline Kaggle entry point. 6 pytest cases pass. Not built: the LLM code-synthesis branch, execution sandbox, and full 400-task tuning — this is a fast symbolic baseline, not a leaderboard-winning ensemble.
 **Version:** 1.0.0  
 
 ---
