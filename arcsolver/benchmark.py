@@ -36,6 +36,13 @@ _FAMILIES = {
     "gravity_down": lambda g: dsl.gravity_down(g),
     "color_map": lambda g: dsl.apply_color_map(g, {1: 3, 2: 4}),
     "compose_recolor_rotate": lambda g: dsl.replace_color(dsl.rotate90(g), 4, 3),
+    # New primitive families (scale / mirror / halves).
+    "scale2": lambda g: dsl.scale2(g),
+    "concat_h_mirror": lambda g: dsl.concat_h_mirror(g),
+    "top_half": lambda g: dsl.top_half(g),
+    "swap_two_most_common": lambda g: dsl.swap_two_most_common(g),
+    # Depth-3 composition: scale2 -> rotate180 -> mirror-concat.
+    "compose3": lambda g: dsl.concat_h_mirror(dsl.rotate180(dsl.scale2(g))),
     # Hard: depends on grid content in a way the DSL can't express (random relabel per task).
     "hard_noise": None,
 }

@@ -48,12 +48,12 @@ python notebooks/kaggle_run.py
 `python -m arcsolver.benchmark` generates tasks per transformation family and reports exact-match solve-rate (the competition's criterion):
 
 ```
-solve rate 0.857 (48/56)
-  rotate180 8/8  reflect_h 8/8  transpose 8/8
-  gravity_down 8/8  color_map 8/8  compose_recolor_rotate 8/8  hard_noise 0/8
+solve rate 0.917 (88/96)
+  rotate180 reflect_h transpose gravity_down color_map ...
+  scale2 concat_h_mirror top_half swap_two_most_common compose3 (all 8/8)  hard_noise 0/8
 ```
 
-Every DSL-expressible family is solved; the unlearnable `hard_noise` family is missed by design — the honest ceiling of a purely symbolic solver, and exactly why an LLM code-gen branch is the next lever. Benchmarked via `tests/test_benchmark.py`.
+Every DSL-expressible family is solved (now including scale / mirror / half primitives and a depth-3 composition via bounded depth-3 search); the unlearnable `hard_noise` family is missed by design — the honest ceiling of a purely symbolic solver, and exactly why an LLM code-gen branch is the next lever. Benchmarked via `tests/test_benchmark.py`.
 
 ## Scope & honesty
 

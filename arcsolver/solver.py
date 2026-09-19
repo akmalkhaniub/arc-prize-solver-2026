@@ -34,6 +34,19 @@ def _base_ops() -> list[NamedProgram]:
         NamedProgram("gravity_down", dsl.gravity_down),
         NamedProgram("crop_nonzero", dsl.crop_nonzero),
         NamedProgram("tile2x2", dsl.tile2x2),
+        # Standard ARC shape/scale/mirror/half primitives.
+        NamedProgram("scale2", dsl.scale2),
+        NamedProgram("scale3", dsl.scale3),
+        NamedProgram("tile_h", dsl.tile_h),
+        NamedProgram("tile_v", dsl.tile_v),
+        NamedProgram("concat_h_mirror", dsl.concat_h_mirror),
+        NamedProgram("concat_v_mirror", dsl.concat_v_mirror),
+        NamedProgram("trim_border", dsl.trim_border),
+        NamedProgram("top_half", dsl.top_half),
+        NamedProgram("bottom_half", dsl.bottom_half),
+        NamedProgram("left_half", dsl.left_half),
+        NamedProgram("right_half", dsl.right_half),
+        NamedProgram("swap_two_most_common", dsl.swap_two_most_common),
     ]
     # A handful of explicit color swaps among the low palette.
     for a in range(1, 5):
@@ -41,6 +54,15 @@ def _base_ops() -> list[NamedProgram]:
             if a != b:
                 ops.append(NamedProgram(f"replace({a}->{b})", lambda g, a=a, b=b: dsl.replace_color(g, a, b)))
     return ops
+
+
+# Curated op subset for the (expensive) depth-3 search — the geometric/scale/recolor
+# primitives that most often compose, kept small to bound the O(n^3) cost.
+_DEPTH3_OPS = {
+    "rotate90", "rotate180", "reflect_h", "reflect_v", "transpose",
+    "gravity_down", "crop_nonzero", "scale2", "tile_h", "tile_v",
+    "concat_h_mirror", "concat_v_mirror", "swap_two_most_common",
+}
 
 
 @dataclass
@@ -96,6 +118,16 @@ class ArcSolver:
                 fn = lambda g, a=op1.fn, b=op2.fn: b(a(g))
                 if self._verify(fn, train):
                     return Solution("SOLVED", f"{op2.name}∘{op1.name}", 2, fn)
+
+        # Depth 3 — bounded to a curated subset so runtime stays within Kaggle limits.
+        # Only reached when depth-1/-2 fail; keeps the common case fast.
+        core = [o for o in self.ops if o.name in _DEPTH3_OPS]
+        for op1 in core:
+            for op2 in core:
+                for op3 in core:
+                    fn = lambda g, a=op1.fn, b=op2.fn, c=op3.fn: c(b(a(g)))
+                    if self._verify(fn, train):
+                        return Solution("SOLVED", f"{op3.name}∘{op2.name}∘{op1.name}", 3, fn)
         return None
 
     def solve_task(self, task: dict) -> list[dict[str, list[list[int]]]]:

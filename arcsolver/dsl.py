@@ -81,6 +81,70 @@ def apply_color_map(g: Grid, mapping: dict[int, int]) -> Grid:
     return res
 
 
+# --- Additional standard ARC primitives (all total, grid -> grid) ---
+
+def scale2(g: Grid) -> Grid:
+    return np.repeat(np.repeat(g, 2, axis=0), 2, axis=1).copy()
+
+
+def scale3(g: Grid) -> Grid:
+    return np.repeat(np.repeat(g, 3, axis=0), 3, axis=1).copy()
+
+
+def tile_h(g: Grid) -> Grid:
+    return np.tile(g, (1, 2)).copy()
+
+
+def tile_v(g: Grid) -> Grid:
+    return np.tile(g, (2, 1)).copy()
+
+
+def concat_h_mirror(g: Grid) -> Grid:
+    return np.concatenate([g, np.fliplr(g)], axis=1).copy()
+
+
+def concat_v_mirror(g: Grid) -> Grid:
+    return np.concatenate([g, np.flipud(g)], axis=0).copy()
+
+
+def trim_border(g: Grid) -> Grid:
+    return g[1:-1, 1:-1].copy() if g.shape[0] > 2 and g.shape[1] > 2 else g.copy()
+
+
+def top_half(g: Grid) -> Grid:
+    return g[: g.shape[0] // 2 or 1].copy()
+
+
+def bottom_half(g: Grid) -> Grid:
+    return g[g.shape[0] // 2:].copy()
+
+
+def left_half(g: Grid) -> Grid:
+    return g[:, : g.shape[1] // 2 or 1].copy()
+
+
+def right_half(g: Grid) -> Grid:
+    return g[:, g.shape[1] // 2:].copy()
+
+
+def most_common_color(g: Grid) -> int:
+    vals, counts = np.unique(g, return_counts=True)
+    return int(vals[int(np.argmax(counts))])
+
+
+def swap_two_most_common(g: Grid) -> Grid:
+    """Swap the two most frequent colors — a common ARC recolor pattern."""
+    vals, counts = np.unique(g, return_counts=True)
+    if vals.size < 2:
+        return g.copy()
+    order = np.argsort(counts)[::-1]
+    a, b = int(vals[order[0]]), int(vals[order[1]])
+    res = g.copy()
+    res[g == a] = b
+    res[g == b] = a
+    return res
+
+
 def grids_equal(a: Grid | None, b: Grid | None) -> bool:
     if a is None or b is None:
         return False
