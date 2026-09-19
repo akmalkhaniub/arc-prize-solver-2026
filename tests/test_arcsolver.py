@@ -63,3 +63,16 @@ def test_submission_format_valid():
     validate_submission(submission, challenges)  # raises on any shape error
     # rot task must be solved exactly
     assert submission["task_rot"][0]["attempt_1"] == dsl.to_list(dsl.rotate180(dsl.to_grid(BASE)))
+
+
+def test_largest_object_extraction():
+    # A big 3x3 block of color 2 plus a stray single cell of color 3.
+    grid = [[2, 2, 2, 0, 0], [2, 2, 2, 0, 3], [2, 2, 2, 0, 0]]
+    out = dsl.largest_object(dsl.to_grid(grid))
+    assert out.shape == (3, 3) and int(out.sum()) == 18  # the 3x3 block of 2s
+
+
+def test_symmetrize_h_completes_mirror():
+    grid = [[1, 0, 0], [2, 0, 0]]  # left column filled, right empty
+    out = dsl.symmetrize_h(dsl.to_grid(grid))
+    assert dsl.to_list(out) == [[1, 0, 1], [2, 0, 2]]

@@ -145,6 +145,47 @@ def swap_two_most_common(g: Grid) -> Grid:
     return res
 
 
+def _label_components(mask: Grid) -> tuple[Grid, int]:
+    """4-connected connected-component labeling in pure NumPy (BFS). mask is boolean."""
+    labels = np.zeros(mask.shape, dtype=np.int32)
+    n = 0
+    h, w = mask.shape
+    for r in range(h):
+        for c in range(w):
+            if mask[r, c] and labels[r, c] == 0:
+                n += 1
+                stack = [(r, c)]
+                labels[r, c] = n
+                while stack:
+                    y, x = stack.pop()
+                    for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                        ny, nx = y + dy, x + dx
+                        if 0 <= ny < h and 0 <= nx < w and mask[ny, nx] and labels[ny, nx] == 0:
+                            labels[ny, nx] = n
+                            stack.append((ny, nx))
+    return labels, n
+
+
+def largest_object(g: Grid, background: int = 0) -> Grid:
+    """Crop to the bounding box of the largest connected non-background component."""
+    labels, n = _label_components(g != background)
+    if n == 0:
+        return g.copy()
+    sizes = [int((labels == i).sum()) for i in range(1, n + 1)]
+    best = int(np.argmax(sizes)) + 1
+    ys, xs = np.where(labels == best)
+    return g[ys.min():ys.max() + 1, xs.min():xs.max() + 1].copy()
+
+
+def symmetrize_h(g: Grid, background: int = 0) -> Grid:
+    """Make left-right symmetric by overlaying the horizontal mirror onto background cells."""
+    res = g.copy()
+    mirror = np.fliplr(g)
+    fill = (res == background) & (mirror != background)
+    res[fill] = mirror[fill]
+    return res
+
+
 def grids_equal(a: Grid | None, b: Grid | None) -> bool:
     if a is None or b is None:
         return False

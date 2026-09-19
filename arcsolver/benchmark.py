@@ -41,6 +41,7 @@ _FAMILIES = {
     "concat_h_mirror": lambda g: dsl.concat_h_mirror(g),
     "top_half": lambda g: dsl.top_half(g),
     "swap_two_most_common": lambda g: dsl.swap_two_most_common(g),
+    "symmetrize_h": lambda g: dsl.symmetrize_h(g),
     # Depth-3 composition: scale2 -> rotate180 -> mirror-concat.
     "compose3": lambda g: dsl.concat_h_mirror(dsl.rotate180(dsl.scale2(g))),
     # Hard: depends on grid content in a way the DSL can't express (random relabel per task).

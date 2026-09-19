@@ -47,6 +47,8 @@ def _base_ops() -> list[NamedProgram]:
         NamedProgram("left_half", dsl.left_half),
         NamedProgram("right_half", dsl.right_half),
         NamedProgram("swap_two_most_common", dsl.swap_two_most_common),
+        NamedProgram("largest_object", dsl.largest_object),
+        NamedProgram("symmetrize_h", dsl.symmetrize_h),
     ]
     # A handful of explicit color swaps among the low palette.
     for a in range(1, 5):
