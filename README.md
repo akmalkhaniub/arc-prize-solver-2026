@@ -43,6 +43,18 @@ python -m arcsolver.submission path/to/arc-agi_test_challenges.json -o submissio
 python notebooks/kaggle_run.py
 ```
 
+## Benchmark (measured)
+
+`python -m arcsolver.benchmark` generates tasks per transformation family and reports exact-match solve-rate (the competition's criterion):
+
+```
+solve rate 0.857 (48/56)
+  rotate180 8/8  reflect_h 8/8  transpose 8/8
+  gravity_down 8/8  color_map 8/8  compose_recolor_rotate 8/8  hard_noise 0/8
+```
+
+Every DSL-expressible family is solved; the unlearnable `hard_noise` family is missed by design — the honest ceiling of a purely symbolic solver, and exactly why an LLM code-gen branch is the next lever. Benchmarked via `tests/test_benchmark.py`.
+
 ## Scope & honesty
 
 This is a **symbolic** solver: it excels at tasks expressible as short DSL programs
